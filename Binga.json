@@ -1,0 +1,39 @@
+{
+  "name": "Binga",
+  "model": "model.glb",
+  "rotations": [
+    { "axis": "x", "degrees": 90 },
+    { "axis": "y", "degrees": 0 },
+    { "axis": "z", "degrees": 90 }
+  ],
+  "cameras": [
+    {
+      "name": "TesteCam",
+      "fov": 50,
+      "resolution": [1600, 1200],
+      "zeroedPositions": [0.2, 0.15, 0.12],
+      "rotations": [
+        { "axis": "x", "degrees": 90 },
+        { "axis": "y", "degrees": 0 },
+        { "axis": "z", "degrees": 90 }
+      ]
+    }
+  ],
+  "components": [
+    {
+      "name": "Arm",
+      "model": "model_0.glb",
+      "logKey": "Binga/Arm"
+    },
+    {
+      "name": "Extensor",
+      "model": "model_0.glb",
+      "logKey": "Binga/Extensor"
+    },
+    {
+      "name": "Intake",
+      "model": "model_0.glb",
+      "logKey": "Binga/Intake"
+    }
+  ]
+}
