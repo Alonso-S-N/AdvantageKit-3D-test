@@ -1,0 +1,256 @@
+{
+
+  "name": "Binga",
+  "model": "model.glb",
+  "logKey": "Binga/base",
+
+  "sourceUrl": "https://cad.onshape.com/documents/d1d8a74cdad94615e6265909/w/d173f5c242a2bf0fdc1ca946/e/c17f437f2c40923b29cb45e3",
+
+  "rotations": [
+
+    {
+
+      "axis": "x",
+
+      "degrees": 180
+
+    },
+   {
+      "axis": "z", 
+      "degrees": 270
+    }
+
+  ],
+
+  "position": [
+
+    0,
+
+    0,
+
+    0
+
+  ],
+
+  "cameras": [
+
+    {
+
+      "name": "Front Camera",
+
+      "rotations": [
+
+        {
+
+          "axis": "y",
+
+          "degrees": 20
+
+        }
+
+      ],
+
+      "position": [
+
+        0.2,
+
+        0,
+
+        0.8
+
+      ],
+
+      "resolution": [
+
+        960,
+
+        720
+
+      ],
+
+      "fov": 90
+
+    },
+
+    {
+
+      "name": "Back Camera",
+
+      "rotations": [
+
+        {
+
+          "axis": "y",
+
+          "degrees": 20
+
+        },
+
+        {
+
+          "axis": "z",
+
+          "degrees": 180
+
+        }
+
+      ],
+
+      "position": [
+
+        -0.2,
+
+        0,
+
+        0.8
+
+      ],
+
+      "resolution": [
+
+        960,
+
+        720
+
+      ],
+
+      "fov": 90
+
+    },
+
+    {
+
+      "name": "Left Camera",
+
+      "rotations": [
+
+        {
+
+          "axis": "y",
+
+          "degrees": 20
+
+        },
+
+        {
+
+          "axis": "z",
+
+          "degrees": 90
+
+        }
+
+      ],
+
+      "position": [
+
+        0,
+
+        0.2,
+
+        0.8
+
+      ],
+
+      "resolution": [
+
+        960,
+
+        720
+
+      ],
+
+      "fov": 90
+
+    },
+
+    {
+
+      "name": "Right Camera",
+
+      "rotations": [
+
+        {
+
+          "axis": "y",
+
+          "degrees": 20
+
+        },
+
+        {
+
+          "axis": "z",
+
+          "degrees": -90
+
+        }
+
+      ],
+
+      "position": [
+
+        0,
+
+        -0.2,
+
+        0.8
+
+      ],
+
+      "resolution": [
+
+        960,
+
+        720
+
+      ],
+
+      "fov": 90
+
+    },
+
+    {
+
+      "name": "Limelight",
+
+      "rotations": [
+    {
+    "axis": "z",
+    "degrees": 90
+    }
+
+    ],
+
+      "position": [
+
+        0,
+
+        0.1,
+
+        0.6
+
+      ],
+
+      "resolution": [
+
+        1920,
+
+        1080
+
+      ],
+
+      "fov": 90
+
+    }
+
+  ],
+
+  "components": [
+{
+      "name": "Arm",
+      "model": "model_0.glb", 
+      "logKey": "Binga/Arm"
+    }
+]
+}

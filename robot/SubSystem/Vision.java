@@ -1,66 +1,71 @@
 package frc.robot.SubSystem;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.List;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
+import org.photonvision.PhotonCamera;
 import org.photonvision.estimation.TargetModel;
+import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.simulation.VisionTargetSim;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
 
 public class Vision extends SubsystemBase {
 
         private double tx,ta,ty;
         private boolean tv;
-        private final VisionSystemSim visionSim = new VisionSystemSim("limelight-front");
-        TargetModel targetModel = new TargetModel(0.5, 0.25);
+        private final PhotonCamera camera;
+        private final VisionSystemSim visionSim;
+        private final SimCameraProperties cameraProps;
+    
 
+        
      
-        private final NetworkTable limelight;
-                
-                
-                    private final LoggedMechanism2d Limelight = new LoggedMechanism2d(0.3, 0.1);
-                    private final LoggedMechanismRoot2d base = Limelight.getRoot("Limelight", 0.6, 0.3);
-                    private final LoggedMechanismLigament2d limelightLig = base.append(
-                        new LoggedMechanismLigament2d("Limelight", 0.1, 90,5,new Color8Bit(0,0,0)));
-                    private final Pose3d targetPose = new Pose3d(16, 4, 2, new Rotation3d(0, 0, Math.PI));
-                    private final VisionTargetSim visionTarget = new VisionTargetSim(targetPose, targetModel);
-                    private final SimCameraProperties cameraProp = new SimCameraProperties();
-                    
-                           
+        private final NetworkTable limelight;           
                     
                     public Vision(){
                     limelight = NetworkTableInstance.getDefault().getTable("limelight-front");
+                      camera = new PhotonCamera("limelight-front");
 
-                 
-                    //cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));   
-                    //cameraProp.setCalibError(0.25, 0.08);
-                    //cameraProp.setFPS(60);
-                    //cameraProp.setAvgLatencyMs(35);
-                    //cameraProp.setLatencyStdDevMs(5);
+        SimCameraProperties camProps = new SimCameraProperties();
+        camProps.setCalibration(960, 720, Rotation2d.fromDegrees(90));
+        camProps.setFPS(20);
+        camProps.setAvgLatencyMs(30);
 
-                    //Translation3d robotToCameraTrl = new Translation3d(0.6, 0.3, 0.5);
-                    //Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(-15), 0);
-                    //Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
+        cameraSim = new PhotonCameraSim(camera, camProps);
 
-                   // AprilTagFieldLayout tagLayout;
-                    //try {
-                       // tagLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
-                    //} catch (IOException e) {
-                       // e.printStackTrace();
-                       // tagLayout = null; 
-                   // }    
-                    //visionSim.addAprilTags(tagLayout);
-                   
-        }
+        visionSim = new VisionSystemSim("limelightSim");
+
+        // Define a posição da câmera no robô
+        Transform3d robotToCamera = new Transform3d(
+            new Translation3d(0.2, 0.0, 0.3),
+            new Rotation3d()
+        );
+        visionSim.addCamera(cameraSim, robotToCamera);
+
+        // Adicionar um alvo simulado no campo
+        Pose3d targetPose = new Pose3d(3.0, 0.0, 1.0, new Rotation3d());
+        VisionTargetSim targetSim = new VisionTargetSim(targetPose, TargetModel.kAprilTag36h11);
+        visionSim.addVisionTargets(targetSim);
+    }
+        }   
     
         public boolean hasTarget() {
          return limelight.getEntry("tv").getDouble(0.0) == 1.0;
@@ -84,13 +89,33 @@ public class Vision extends SubsystemBase {
     
         @Override
         public void simulationPeriodic(){
-        Logger.recordOutput("LimelightMech",Limelight);
-        Logger.recordOutput("Limelight/tx", tx);
-        Logger.recordOutput("Limelight/ty", ty);
-        Logger.recordOutput("Limelight/ta", ta);
-        Logger.recordOutput("Limelight/tv", tv);
-      
-        //visionSim.getDebugField();
+
+            var result = camera.getLatestResult();
+            boolean hasTargets = result.hasTargets();
+    
+            List<PhotonTrackedTarget> targets = result.getTargets();
+    
+            PhotonTrackedTarget target = result.getBestTarget();
+    
+            double yaw = target.getYaw();
+            double pitch = target.getPitch();
+            double area = target.getArea();
+            double skew = target.getSkew();
+            Transform3d pose = target.getAlternateCameraToTarget();
+            List<TargetCorner> corners = target.getDetectedCorners();
+    
+            int targetID = target.getFiducialId();
+            double poseAmbiguity = target.getPoseAmbiguity();
+            Transform3d bestCameraToTarget = target.getBestCameraToTarget();
+            Transform3d alternateCameraToTarget = target.getAlternateCameraToTarget();
+        
+          camera.takeInputSnapshot();
+          camera.takeOutputSnapshot();
+             
+          Logger.recordOutput("Limelight/tx", tx);
+          Logger.recordOutput("Limelight/ty", ty);
+          Logger.recordOutput("Limelight/ta", ta);
+          Logger.recordOutput("Limelight/tv", tv);
     }
  }
 

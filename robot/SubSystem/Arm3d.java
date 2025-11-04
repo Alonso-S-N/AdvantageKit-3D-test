@@ -27,35 +27,32 @@ public class Arm3d {
 
     public void update() {
         // Braço — sai da base do robô
-        Rotation3d armRotation = new Rotation3d(0, Math.toRadians(armAngleDeg), 0);
+        Rotation3d armRotation = new Rotation3d(Math.toRadians(185), Math.toRadians(armAngleDeg), Math.toRadians(90));
         Transform3d baseToArm = new Transform3d(
-            new Translation3d(0.1, 0.1, 0.2),
+            new Translation3d(0, 0, 0),
             armRotation
         );
 
-        Pose3d armPose = robotPose.plus(baseToArm);
+       
 
         // Extensor — sai da ponta do braço
         Transform3d armToExtensor = new Transform3d(
-            new Translation3d(ARM_LENGTH, 0.1, 0.2),
+            new Translation3d(ARM_LENGTH, 0, 0),
             new Rotation3d(0, 0, 0)
         );
 
-        Pose3d extensorBase = armPose.plus(armToExtensor);
 
         // Ponta do intake — extensão variável
         Transform3d extensorToIntake = new Transform3d(
-            new Translation3d(EXTENSOR_LENGTH + extensorMeters, 0.1, 0.2),
+            new Translation3d(EXTENSOR_LENGTH + extensorMeters, 0, 0),
             new Rotation3d(0, 0, 0)
         );
 
-        Pose3d intakePose = extensorBase.plus(extensorToIntake);
 
-        Logger.recordOutput("Binga/Base", robotPose);
-        Logger.recordOutput("Binga/Arm", armPose);
-        Logger.recordOutput("Binga/Extensor", extensorBase);
-        Logger.recordOutput("Binga/Intake", intakePose);
-        Logger.recordOutput("Binga/Array", new Pose3d[] { armPose, extensorBase, intakePose }); // opcional
 
+        Logger.recordOutput("Binga/base", robotPose);
+        Logger.recordOutput("Binga/arm", baseToArm);
+        Logger.recordOutput("Binga/extensor", armToExtensor);
+        Logger.recordOutput("Binga/intake", extensorToIntake);
     }
 }
