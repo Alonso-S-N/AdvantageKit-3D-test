@@ -9,7 +9,7 @@ public class Arm3d {
     private static final double EXTENSOR_LENGTH = 0.3;
 
     // Estados
-    private double armAngleDeg = 90;   // ângulo em relação ao chão
+    private double armAngleDeg = 0;   // ângulo em relação ao chão
     private double extensorMeters = 0; // extensão linear
     private Pose3d robotPose = new Pose3d(); // posição base do robô
 
@@ -27,9 +27,9 @@ public class Arm3d {
 
     public void update() {
         // Braço — sai da base do robô
-        Rotation3d armRotation = new Rotation3d(Math.toRadians(185), Math.toRadians(armAngleDeg), Math.toRadians(90));
+        Rotation3d armRotation = new Rotation3d(Math.toRadians(385 + armAngleDeg), Math.toRadians(0), Math.toRadians(270));
         Transform3d baseToArm = new Transform3d(
-            new Translation3d(0, 0, 0),
+            new Translation3d(0.2, 0, 1.17),
             armRotation
         );
 
@@ -46,13 +46,11 @@ public class Arm3d {
         Transform3d extensorToIntake = new Transform3d(
             new Translation3d(EXTENSOR_LENGTH + extensorMeters, 0, 0),
             new Rotation3d(0, 0, 0)
-        );
+        ); 
 
 
 
         Logger.recordOutput("Binga/base", robotPose);
-        Logger.recordOutput("Binga/arm", baseToArm);
-        Logger.recordOutput("Binga/extensor", armToExtensor);
-        Logger.recordOutput("Binga/intake", extensorToIntake);
+        Logger.recordOutput("Binga/base/arm", baseToArm);
     }
 }

@@ -15,6 +15,9 @@ public class AutonomousCommand extends Command {
   private final Vision vision;
   private final double targetArea;
   private boolean finished;
+  public double RightSpeed;
+
+  public double LeftSpeed;
   private Timer timer = new Timer();
 
   private final double hysteresis = 0.5; 
@@ -24,7 +27,7 @@ public class AutonomousCommand extends Command {
       this.drive = drive;
       this.vision = vision;
       this.targetArea = targetArea;
-      addRequirements(drive, vision);
+      addRequirements(drive,vision);
   }
 
   @Override
@@ -108,6 +111,9 @@ public class AutonomousCommand extends Command {
 
       left = Math.max(-0.5, Math.min(0.5, left));
       right = Math.max(-0.5, Math.min(0.5, right));
+
+      RightSpeed = right;
+      LeftSpeed = left;
 
       if (ta >= (targetArea - hysteresis)) {
           state = State.segurando; 

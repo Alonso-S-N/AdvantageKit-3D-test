@@ -164,6 +164,9 @@ public class BracinSub extends SubsystemBase {
 
   public void MexePruLado() {
     armMotor.set(0.10);
+     if (RobotBase.isSimulation()){
+      armMotor.set(1);
+     }
   }
 
   public void setRobotPose3d(Pose3d pose) {
@@ -173,6 +176,9 @@ public class BracinSub extends SubsystemBase {
 
   public void MexePruOutro(){
     armMotor.set(-0.10);
+    if (RobotBase.isSimulation()){
+      armMotor.set(-1);
+    }
   }
 
   public void StopBraceta(){
@@ -197,18 +203,18 @@ public class BracinSub extends SubsystemBase {
       double simulateRate = extensorOut * 5.0;
       double simulatedRate = motorOut * 5.0; 
       armEncoderSim.setRate(simulatedRate);
-      armEncoderSim.setDistance(armEncoder.getDistance() + simulatedRate * 0.02);
+      double currentSimPosition = armEncoderSim.getDistance();
+      //armEncoderSim.setDistance(armEncoder.getDistance() + simulatedRate * 0.02);
       extensorEncoderSim.setRate(simulateRate);
-      extensorEncoderSim.setDistance(extensorEncoder.getDistance() + (simulateRate * 0.02));
-
-      extensorEncoderSim.getDistance();
-      armEncoderSim.getDistance(); 
+      //extensorEncoderSim.setDistance(extensorEncoder.getDistance() + (simulateRate * 0.02));
+      armEncoderSim.setDistance(currentSimPosition + (simulatedRate * 0.02));
       double armAngleDeg = armEncoder.getDistance() * Constants.GrausMax; // em graus
       armLig.setAngle(armAngleDeg);
       double extensorAngleDeg = extensorEncoder.getDistance() * Constants.GrausMax;
       extensorLig.setAngle(extensorAngleDeg);
+      armSparkEncoder.setPosition(armEncoderSim.getDistance());
       
-      double armAngleRad = armEncoder.getDistance() * 2 * Math.PI; 
+      double armAngleRad = armEncoderSim.getDistance() * 2 * Math.PI; 
       Logger.recordOutput("Arm/Mechanism", new edu.wpi.first.math.geometry.Rotation2d(armAngleRad));
       Logger.recordOutput("Arm/PositionTicks", armEncoderSim.getDistance());
       Logger.recordOutput("Arm/Mechanism2d", mech);

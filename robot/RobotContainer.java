@@ -27,7 +27,7 @@ public class RobotContainer {
   
   private final AutonomousCommand auto;
 
-  private final Vision vision = new Vision();
+  private final Vision vision = new Vision(driveSubsystem,Constants.targetArea);
 
   private final PidCommand Pdiddy;
   
@@ -40,9 +40,9 @@ public class RobotContainer {
     CommandScheduler.getInstance().registerSubsystem(driveSubsystem);
 
     // Initialize Loc command with drive subsystem and joystick
-    locCommand = new Loc(driveSubsystem,joyDeliciu,baby);
-
     auto = new AutonomousCommand(driveSubsystem,vision,Constants.targetArea);
+
+    locCommand = new Loc(driveSubsystem,joyDeliciu,baby,vision,JoyDelicioso);
 
     // Set default command
     driveSubsystem.setDefaultCommand(locCommand);

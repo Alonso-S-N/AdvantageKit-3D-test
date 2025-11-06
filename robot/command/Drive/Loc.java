@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.SubSystem.BracinSub;
 import frc.robot.SubSystem.Drive;
+import frc.robot.SubSystem.Vision;
+import frc.robot.command.Auto.AutonomousCommand;
 import frc.robot.Calcs;
 import frc.robot.Calcs.DriveSpeeds;
 
@@ -12,17 +14,24 @@ public class Loc extends Command {
   
   private final Drive driveSubsystem;
   private final Joystick joyDeliciu;
+  private final Joystick joyDelicioso;
   private final BracinSub baby;
+  private final Vision vision;
   DriveSpeeds speeds;
   
     private double B_Speed = 0;
-    private boolean a, b, x;
+    private boolean a, b, x, a2;
+    private boolean joyDeliciosoA2Pressed;
+
+    
   
-    public Loc(Drive driveSubsystem,Joystick joyDeliciu,BracinSub baby) {
+    public Loc(Drive driveSubsystem,Joystick joyDeliciu,BracinSub baby,Vision vision,Joystick joyDelicioso) {
       this.driveSubsystem = driveSubsystem;
+      this.vision = vision;
+      this.joyDelicioso = joyDelicioso;
       this.joyDeliciu = joyDeliciu;
       this.baby = baby;
-    addRequirements(driveSubsystem);
+    addRequirements(driveSubsystem,vision);
   }
 
   @Override
@@ -53,10 +62,18 @@ private void setDriveSpeeds(double left, double right) {
     a = joyDeliciu.getRawButton(Constants.a);
     b = joyDeliciu.getRawButton(Constants.b);
     x = joyDeliciu.getRawButton(Constants.x);
+    a2 = joyDelicioso.getRawButtonPressed(Constants.a);
+    
+           
+    if (a2){
+      joyDeliciosoA2Pressed = !joyDeliciosoA2Pressed;
+      vision.resetTime();
+    }
 
     if (a) B_Speed = 0.25;
     else if (b) B_Speed = 0.5;
     else if (x) B_Speed = 1.0;
+  
   }
 
   public void MainControl() {
@@ -64,7 +81,8 @@ private void setDriveSpeeds(double left, double right) {
     double Y = joyDeliciu.getY();
     double X1 = joyDeliciu.getRawAxis(Constants.X1);
     double Y2 = joyDeliciu.getRawAxis(Constants.Y2);
-
+   
+  
     if (joyDeliciu.getPOV() != Constants.povDeadZone){
       speeds = Calcs.calculatePovDrive(joyDeliciu, B_Speed);
     }
@@ -73,8 +91,12 @@ private void setDriveSpeeds(double left, double right) {
     }
       else if (Math.abs(X1) >= Constants.deadZone || Math.abs(Y2) >= Constants.deadZone || Math.abs(X1) < Constants.NegativeDeadZone || Math.abs(Y2) < Constants.NegativeDeadZone){
        speeds = Calcs.calculateAnalogDrive2(joyDeliciu,B_Speed);
-    }
-      else {
+    } else if (joyDeliciosoA2Pressed){
+     vision.Perseguir();
+     speeds = new DriveSpeeds(vision.LeftSpeed, vision.RightSpeed);
+     System.out.println("timer" + vision.getTime());
+    
+    } else {
       stopDrive();
       speeds = null;
       return;
@@ -82,6 +104,7 @@ private void setDriveSpeeds(double left, double right) {
   
     setDriveSpeeds(speeds.left, speeds.right);
   }
+
 
   public void Smart(){
     if (speeds != null) {

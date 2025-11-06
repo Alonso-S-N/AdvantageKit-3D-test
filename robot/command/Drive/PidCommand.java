@@ -116,7 +116,7 @@ public class PidCommand extends Command {
    
    if (Xpressed || YPressed){
     MexerComPIDSLK();
-   }else {
+   } else {
    mexerBracinSlk();
    mexerIntakeSlk();
    }
