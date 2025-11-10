@@ -74,14 +74,12 @@ public class Vision extends SubsystemBase {
                 camera = new PhotonCamera("camera");
 
 limelight = NetworkTableInstance.getDefault().getTable("limelight-front");
-PhotonCamera camera = new PhotonCamera("camera");
-
 AprilTagFieldLayout tagLayout = AprilTagFields.k2025ReefscapeAndyMark.loadAprilTagLayoutField();
 
 if (RobotBase.isSimulation()) {
 
   SimCameraProperties props = new SimCameraProperties();
-  props.setCalibration(960, 720, Rotation2d.fromDegrees(90));  //resolução e FOV
+  props.setCalibration(1920, 1080, Rotation2d.fromDegrees(90)); 
   props.setFPS(30);
   props.setAvgLatencyMs(30);
   props.setLatencyStdDevMs(5);
@@ -91,15 +89,13 @@ if (RobotBase.isSimulation()) {
   visionSim.addAprilTags(tagLayout);
 
   Transform3d robotToCamera = new Transform3d(
-    new Translation3d(0.2, 0.0, 0.6),
-    new Rotation3d(0, 0, 0)
+    new Translation3d(-0.2, 0.6 , 0.6),
+    new Rotation3d(0, Math.toRadians(25), 0)
                 );
     
                 
                 cameraSim = new PhotonCameraSim(camera, props);
                 visionSim.addCamera(cameraSim, robotToCamera);
-    
-      
     }   
   }
     
@@ -179,34 +175,43 @@ if (RobotBase.isSimulation()) {
         @Override
         public void simulationPeriodic(){
 
-          if (visionSim != null) {
-            // Atualiza a posição da simulação de visão com base no drive (pose estimada do robô)
-            visionSim.update(drive.getPose());
-        }
-    
-        // Obtém o resultado da câmera simulada
-        if (camera != null) {
-            try {
-                var result = camera.getLatestResult();
-                if (result.hasTargets()) {
-                    var target = result.getBestTarget();
-                    tx = target.getYaw();
-                    ty = target.getPitch();
-                    ta = target.getArea();
-                    tv = true;
-                } else {
-                    tv = false;
-                    tx = ty = ta = 0;
-                }
-            } catch (Exception e) {
-                System.out.println("[Vision] Erro getLatestResult: " + e.getMessage());
-            }
-        }
-    
-        SmartDashboard.putBoolean("Sim Target", tv);
-        SmartDashboard.putNumber("Sim TX", tx);
-        SmartDashboard.putNumber("Sim TY", ty);
-        SmartDashboard.putNumber("Sim TA", ta);
+    if (visionSim != null) {
+      Pose3d robotPose3d = drive.getPose3d(); 
+      visionSim.update(robotPose3d);
+  }
+  double txLocal = 0, tyLocal = 0, taLocal = 0;
+  boolean tvLocal = false;
+
+  if (camera != null) {
+      try {
+          var result = camera.getLatestResult();
+          if (result.hasTargets()) {
+              var best = result.getBestTarget();
+              txLocal = best.getYaw();       // graus
+              tyLocal = best.getPitch();     // graus
+              taLocal = best.getArea();      // confirmar unidade
+              tvLocal = true;
+          }
+      } catch (Exception e) {
+          System.out.println("[Vision] getLatestResult erro: " + e.getMessage());
+      }
+  }
+
+  this.tx = txLocal; this.ty = tyLocal; this.ta = taLocal; this.tv = tvLocal;
+  limelight.getEntry("tv").setNumber(tvLocal ? 1.0 : 0.0);
+  limelight.getEntry("tx").setNumber(txLocal);
+  limelight.getEntry("ty").setNumber(tyLocal);
+  limelight.getEntry("ta").setNumber(taLocal);
+
+  SmartDashboard.putBoolean("Sim Target", tvLocal);
+  SmartDashboard.putNumber("Sim TX", txLocal);
+  SmartDashboard.putNumber("Sim TA", taLocal);
+
+
+  Logger.recordOutput("Vision/tx", txLocal);
+  Logger.recordOutput("Vision/ta", taLocal);
+  Logger.recordOutput("Vision/tv", tvLocal ? 1.0 : 0.0);
+}
     }
- }
+
 

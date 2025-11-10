@@ -169,6 +169,12 @@ import org.littletonrobotics.junction.Logger;
      }
     }
   }
+    public Pose3d getPose3d(){
+      return new Pose3d(
+        new Translation3d(getPose().getX(), getPose().getY(), 0.0),
+        new Rotation3d(0.0, 0.0, getHeading().getRadians())
+      );
+    }
 
     public Rotation2d getHeading() {
       return Rotation2d.fromDegrees(gyro.getAngle());
